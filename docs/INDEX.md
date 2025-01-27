@@ -21,11 +21,26 @@ These documentation pages are also rendered using marked 💯
 
 **CLI:** `npm install -g marked`
 
-**In-browser:** `npm install marked`
-
+**In-browser:**
+```
+npm install marked
+```
 <h2 id="usage">Usage</h2>
 
-### Warning: 🚨 Marked does not [sanitize](/using_advanced#options) the output HTML. Please use a sanitize library, like [DOMPurify](https://github.com/cure53/DOMPurify) (recommended), [sanitize-html](https://github.com/apostrophecms/sanitize-html) or [insane](https://github.com/bevacqua/insane) on the output HTML! 🚨
+### Warning: 🚨 Marked does not [sanitize](/using_advanced#options) the output HTML. If you are processing potentially unsafe strings, it's important to filter for possible XSS attacks. Some filtering options include [DOMPurify](https://github.com/cure53/DOMPurify) (recommended), [js-xss](https://github.com/leizongmin/js-xss), [sanitize-html](https://github.com/apostrophecms/sanitize-html) and [insane](https://github.com/bevacqua/insane) on the *output* HTML! 🚨
+
+```
+DOMPurify.sanitize(marked.parse(`<img src="x" onerror="alert('not happening')">`));
+```
+
+**⚠️ Input: special ZERO WIDTH unicode characters (for example `\uFEFF`) might interfere with parsing. Some text editors add them at the start of the file (see: [#2139](https://github.com/markedjs/marked/issues/2139)).**
+
+```js
+// remove the most common zerowidth characters from the start of the file
+marked.parse(
+  contents.replace(/^[\u200B\u200C\u200D\u200E\u200F\uFEFF]/,"")
+)
+```
 
 **CLI**
 
@@ -59,6 +74,30 @@ $ cat readme.html
 $ marked --help
 ```
 
+*CLI Config*
+
+A config file can be used to configure the marked cli.
+
+If it is a `.json` file it should be a JSON object that will be passed to marked as options.
+
+If `.js` is used it should have a default export of a marked options object or a function that takes `marked` as a parameter.
+It can use the `marked` parameter to install extensions using `marked.use`.
+
+By default the marked cli will look for a config file in your home directory in the following order.
+
+- `~/.marked.json`
+- `~/.marked.js`
+- `~/.marked/index.js`
+
+```bash
+# Example with custom config
+
+echo '{ "breaks": true }' > config.json
+
+$ marked -s 'line1\nline2' -c config.json
+<p>line1<br>line2</p>
+```
+
 **Browser**
 
 ```html
@@ -78,6 +117,15 @@ $ marked --help
 </body>
 </html>
 ```
+or import esm module
+
+```html
+<script type="module">
+  import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
+  document.getElementById('content').innerHTML =
+    marked.parse('# Marked in the browser\n\nRendered by **marked**.');
+</script>
+```
 
 **Node.js**
 
@@ -95,13 +143,22 @@ Marked offers [advanced configurations](/using_advanced) and [extensibility](/us
 
 We actively support the features of the following [Markdown flavors](https://github.com/commonmark/CommonMark/wiki/Markdown-Flavors).
 
-| Flavor                                                     | Version | Status                                                             |
-| :--------------------------------------------------------- | :------ | :----------------------------------------------------------------- |
-| The original markdown.pl                                   | --      |                                                                    |
-| [CommonMark](http://spec.commonmark.org/0.30/)             | 0.30    | [Work in progress](https://github.com/markedjs/marked/issues/1202) |
-| [GitHub Flavored Markdown](https://github.github.com/gfm/) | 0.29    | [Work in progress](https://github.com/markedjs/marked/issues/1202) |
+<!--{{test-results-table}}-->
 
 By supporting the above Markdown flavors, it's possible that Marked can help you use other flavors as well; however, these are not actively supported by the community.
+
+<h2 id="tools">List of Tools Using Marked</h2>
+
+We actively support the usability of Marked in super-fast markdown transformation, some of Tools using `Marked` for single-page creations are
+
+| Tools                                                               |                  Description                                               |
+| :-----------------------------------------------------------------  | :------------------------------------------------------------------------  |
+| [zero-md](https://zerodevx.github.io/zero-md/)                      | A native markdown-to-html web component to load and display an external MD file.It uses Marked for super-fast markdown transformation. |
+| [texme](https://github.com/susam/texme)                             | TeXMe is a lightweight JavaScript utility to create self-rendering Markdown + LaTeX documents.             |
+| [StrapDown.js](https://naereen.github.io/StrapDown.js/)             | StrapDown.js is an awesome on-the-fly Markdown to HTML text processor.                |
+| [raito](https://raito.arnaud.at/)             | Mini Markdown Wiki/CMS in 8kb of JavaScript.                |
+| [Homebrewery](https://homebrewery.naturalcrit.com/)             | The Homebrewery is a tool for making authentic looking D&D content using Markdown. It is distributed under the terms of the MIT.             |
+| [marked_reader](https://github.com/CNOCTAVE/marked_reader)          | marked_reader is an open source Markdown reader packed by Electron. |
 
 <h2 id="security">Security</h2>
 
