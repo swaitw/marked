@@ -5,6 +5,7 @@ html, body {
 	color: #333;
 	background-color: #fbfbfb;
 	height: 100%;
+	overflow: auto;
 }
 
 textarea {
@@ -21,14 +22,6 @@ header {
 
 header h1 {
 	margin: 0;
-}
-
-.github-ribbon {
-	position: absolute;
-	top: 0;
-	right: 0;
-	border: 0;
-	z-index: 1000;
 }
 
 .other-demos {
@@ -73,4 +66,16 @@ header h1 {
 .error {
 	border-color: red;
 	background-color: #FEE
+}
+
+.loadingError {
+	background-color: #fee;
+	font-weight: bold;
+	color: #f00;
+	text-align: center;
+	padding: 10px;
+}
+
+#responseTime {
+    display: inline-block;
 }
